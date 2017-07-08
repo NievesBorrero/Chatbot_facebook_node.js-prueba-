@@ -1,3 +1,5 @@
 # Chatbot para Facebook Messenger
 
-Probando a crear un chatbot para Facebook Messenger haciendo uso de Node.js, Express y ngrok
+Probando a crear un chatbot para Facebook Messenger haciendo uso de Node.js, Express y ngrok.
+
+Poco a poco...
