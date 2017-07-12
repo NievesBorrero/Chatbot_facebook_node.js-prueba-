@@ -1,5 +1,5 @@
 
-/*---CONFIGURACIÓN/ CONEXIÓN DE LA APLICACIÓN CON NUESTRO SISTEMA----*/
+/*---CONFIGURACIÓN/ CONEXIÓN DE LA APLICACIÓN CON NUESTRO SISTEMA-----*/
 
 
 /* Llamamos al paquete express para obtener todas sus funcionalidades.*/
