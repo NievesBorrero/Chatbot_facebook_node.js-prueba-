@@ -16,7 +16,7 @@ const APP_TOKEN ='EAAYuPkoZA9iIBAIKwpkGBnrkxZAyxyOvtZCbTfNYHznWLpH16l39wOC1RB5DM
 obtienen de la variable express*/
 var app = express()
 
-use(bodyParser.json())
+app.use(bodyParser.json())
 
 var PORT = process.env.PORT || 3000 
 
