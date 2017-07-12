@@ -18,12 +18,12 @@ var app = express()
 
 app.use(bodyParser.json())
 
-var PORT = process.env.PORT || 3000 
+var port = process.env.PORT || 3000 
 
 /* El servidor se iniciará en el puerto dado por heroku (usamos el método listen) y enviará el mensaje mediante
 un callback.
 */
-app.listen(PORT, function(){
+app.listen(port, function(){
 	console.log('server listen localhost: 3000')
 })
 
