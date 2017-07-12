@@ -108,7 +108,7 @@ function procesarMsj(senderID, messageText){
 		enviarMensajeTemplate(senderID)
 	}
 	else{
-		mensaje= '[Heroku]Por ahora solo sé repetir las cosas: '+ messageText
+		mensaje= 'Por ahora solo sé repetir las cosas: '+ messageText
 	}
 
 	enviarTextMsj(senderID, mensaje)
