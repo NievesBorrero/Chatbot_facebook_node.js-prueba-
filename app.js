@@ -18,10 +18,12 @@ var app = express()
 
 app.use(bodyParser.json())
 
+var PORT = process.env.PORT || 3000
+
 /* El servidor se iniciará en el puerto 3000 (usamos el método listen) y enviará el mensaje mediante
 un callback.
 */
-app.listen(3000, function(){
+app.listen(PORT, function(){
 	console.log('server listen localhost: 3000')
 })
 
@@ -79,11 +81,31 @@ enviarla al usuario
 */
 function procesarMsj(senderID, messageText){	
 	var mensaje= '';
+
 	if(siContiene(messageText, 'ayuda')){
 		mensaje= 'Por el momento no te puedo ayudar :('
 	}
 	else if(siContiene(messageText, 'info')){
 		mensaje= 'Hola, qué tal? mi correo es probandoBots@gmail.com'
+	}
+	else if(siContiene(messageText, 'sombrero') && siContiene(messageText, 'recomienda')){
+		enviarMensajeImagen(senderID)
+		mensaje = 'Este...es tu sombrero, baby'
+	}
+	/*else if(siContiene(messageText, 'tiket')){
+		enviarPdf(senderID)
+	}*/
+	else if(siContiene(messageText, 'clima') || siContiene(messageText, 'tiempo') || siContiene(messageText, 'temperatura')){
+		getClima(function(_temperatura){
+			enviarTextMsj(senderID, getMessageClima(_temperatura)) //Temperatura es una variable de callback, 
+			                                                         //para distinguirla ponemos _ delante
+		})
+	}
+	else if(siContiene(messageText, 'Hola')|| siContiene(messageText, 'hola')){
+		typing_on(senderID)
+		mensaje = 'Hola, me parece que esa linda testa requiere de un sombrero acorde 🎩'
+		typing_on(senderID)
+		enviarMensajeTemplate(senderID)
 	}
 	else{
 		mensaje= 'Por ahora solo sé repetir las cosas: '+ messageText
@@ -93,14 +115,111 @@ function procesarMsj(senderID, messageText){
 
 }
 
+/* Simula que nuestro bot está escribiendo */
+function typing_on(senderID){
+	var messageData = {
+		"recipient":{
+	  		"id":"USER_ID"
+	  	},
+	  		"sender_action":"typing_on"
+	  	}
+
+	  	callSendAPI(messageData)
+}
+
+/**
+* Envía un mensaje en una plantilla de tipo genérico.
+*/
+function enviarMensajeTemplate(senderID){
+	var messageData = {
+		recipient:{
+	    	id: senderID
+	  	},
+		  message:{
+		    attachment:{
+		      type:"template",
+		      payload:{
+		        template_type:"generic",
+		        elements:[elementTemplate()]
+		      }
+		    }
+		  }
+		}
+
+  callSendAPI(messageData)
+}
+
+/* Devuelve los elementos de los que consta la plantilla de tipo genérico*/
+function elementTemplate(){
+	 return{ 
+			title:"El sombrerero",
+		 	item_url: "https://www.google.es/",
+	     	image_url:"https://1.bp.blogspot.com/-D27cqLlmkRo/Vz-7M0e1u4I/AAAAAAAAFHw/Lar1Wwx21sspXZUnuNnfqlQ4nQ9oLiKmwCLcB/s1600/sombrerero%2BlocoII.jpg",
+	     	subtitle:"Estilista, fabricante de sombreros y amante del té",
+	      	buttons:[
+		          	buttonTemplate('Sitio web', 'https://sombrero.bon-clic-bon-genre.es/'),
+		          	buttonTemplate('Github', 'https://github.com/NievesBorrero?tab=repositories')
+	          ]
+      }
+}
+
+/* Permite crear un botón de tipo web url */
+function buttonTemplate(title, url){
+	return{
+		type: 'web_url',
+		url: url,
+		title: title
+	}
+}
 
 /* Busca dentro del texto si contiene esa letra*/
 function siContiene(texto, palabra){
-	return texto.indexOf(palabra) > -1 //Si en ese texto, el índice donde encuentra
+	if(typeof texto=='undefined' || texto.lenght<=0) 
+			return false
+		return texto.indexOf(palabra) > -1 //Si en ese texto, el índice donde encuentra
 										//la palabra es mayor de -1,la ha encontrado.
 }
 
-/* Permite enviar el mensaje de texto al usuario*/
+/* Permite enviar una imagen*/
+function enviarMensajeImagen(senderID){
+	var messageData = {
+		recipient:{
+    		id: senderID
+  	},
+  	message:{
+    	attachment:{
+      		type:"image",
+      		payload:{
+        		url:"https://images-na.ssl-images-amazon.com/images/I/41BvJmGizBL._SY300_.jpg"
+      		}
+    	}
+  	}
+}
+	callSendAPI(messageData)
+
+	}
+
+/* Permite enviar un pdf 
+function enviarPdf(senderID){
+	var messageData = {
+  		 recipient: {
+  		 	id:senderID
+  		 }, 
+         message:{
+         	attachment:{
+         		type:"file", 
+         		payload:{ 
+         		url: "https://codeweb.000webhostapp.com/files/prueba.pdf"
+         		}}},                  
+	}
+
+	callSendApi(messageData)
+}*/
+
+
+/*----------------------------- TEMPERATURA --------------------------*/
+
+/* Permite enviar el mensaje de texto plano al usuario*/
 function enviarTextMsj(senderID, msj){
 	var messageData = {
 		recipient : {
@@ -112,6 +231,33 @@ function enviarTextMsj(senderID, msj){
 	}
 	callSendAPI(messageData)
 }
+
+
+/*Permite enviar el mensaje al usuario en temperatura*/
+function getClima(callback){
+	request('http://api.geonames.org/findNearByWeatherJSON?lat=-12.046374&lng=-77.042793&username=eduardo_gpg'),
+	function(error, response, data){
+		if(!error){
+			var response = JSON.parse(data) // Parseamos todo el objeto a JSON para poder trabajarlo, ya que la url nos devuelve solo un texto plano
+			var temperatura = response.weatherObservation.temperature
+			callback(temperatura) //Ejecutamos el callback devolviendo la temperatura.
+		}
+		else{
+			callback(15) // Temperatura por defecto.
+		}
+	}
+}
+
+/*Formatea el texto de regreso al cliente*/
+function getMessageClima(temperatura){
+	if(temperatura > 30){
+		return 'Nos encontramos a '+temperatura+', hace demasiada calor... Comprate una limonada :V'
+	}
+	else{
+		return 'Nos encontramos a'+temperatura+', es un buen día para salir'
+	}
+}
+
 
 /* 
 Responde a facebook para decirle que esa será la respuesta que le voy a dar 
@@ -130,4 +276,5 @@ function callSendAPI(messageData){
 				console.log('Mensaje enviado')
 					})
 }
+
 
