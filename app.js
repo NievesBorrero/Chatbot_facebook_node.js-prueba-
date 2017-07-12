@@ -16,14 +16,14 @@ const APP_TOKEN ='EAAYuPkoZA9iIBAIKwpkGBnrkxZAyxyOvtZCbTfNYHznWLpH16l39wOC1RB5DM
 obtienen de la variable express*/
 var app = express()
 
-app.use(bodyParser.json())
+use(bodyParser.json())
 
-var port = process.env.PORT || 3000 
+var PORT = process.env.PORT || 3000 
 
 /* El servidor se iniciará en el puerto dado por heroku (usamos el método listen) y enviará el mensaje mediante
 un callback.
 */
-app.listen(port, function(){
+app.listen(PORT, function(){
 	console.log('server listen localhost: 3000')
 })
 
