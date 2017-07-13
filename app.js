@@ -10,7 +10,7 @@ const bodyParser = require ('body-parser')
 const request = require ('request')
 
 /*Token de acceso a nuestra página de facebook*/
-const APP_TOKEN ='EAAYuPkoZA9iIBAIKwpkGBnrkxZAyxyOvtZCbTfNYHznWLpH16l39wOC1RB5DMES38R9aVHTvDLJZBszpfFAGzAl175QY9Yv11NB0utT1ZArzRLQwxJ3tyqwAnbnrt7ea7cuyxbsCuylZCGwCKiTGkB6A6AI2OA2wi3kvVjtZBhQKpaZB87AZC9ouP'
+const APP_TOKEN ='Aqui_token_facebook'
 
 /*En la variable app guardamos todas las funcionalidades que se 
 obtienen de la variable express*/
@@ -40,7 +40,7 @@ app.get('/', function(req, res){
 
 /* Esto es para configurar los webhook */
 app.get('/webhook', function(req, res){
-	if(req.query['hub.verify_token'] === 'clave_programado'){
+	if(req.query['hub.verify_token'] === 'Aqui_mi_token'){
 		res.send(req.query['hub.challenge'])
 	}
 	else{
